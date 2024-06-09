@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ITS-Project: Church - Barrocco Ontology</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">ITS-Project: Church - Barrocco Ontology</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="index.html">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Overview-Goals</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Methodology</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <main class="container my-5" style="margin-bottom: 100px; padding-bottom: 100px;">
+        <nav class="mb-5">
+            <h2 class="mb-3">Indice</h2>
+            <ol>
+                <li>Query SPARQL
+                    <ul class="ml-3">
+                        <li><a href="#query1">1° Query</a></li>
+                        <li><a href="#query2">2° Query</a></li>
+                        <li><a href="#query3">3° Query</a></li>
+                        <li><a href="#query4">4° Query</a></li>
+                        <li><a href="#query5">5° Query</a></li>
+                        <li><a href="#query6">6° Query</a></li>
+                        <li><a href="#query7">7° Query</a></li>
+                        <li><a href="#query8">8° Query</a></li>
+                    </ul>
+                </li>
+                <li>LLMs
+                    <ul class="ml-3">
+                        <li><a href="#chat">1° Metodologia - ChatGPT</a></li>
+                        <li><a href="#lama">2° Metodologia - LLaMa </a></li>
+                        <li><a href="#gemini">3° Metodologia - Gemini </a></li>
+                        <li><a href="#mistral">4° Metodologia - MISTRAL</a></li>
+                    </ul>
+                </li>
+                <li><a href="#concl">Conclusioni finali</a></li>
+            </ol>
+        </nav>
+        <div>
+            <section class="mb-5">
+                <h2 class="mb-5">SPARQL</h2>
+                <p>In questa sezione vengono analizzate le query SPARQL utilizzate per interrogare il grafo di conoscenza. Per ciascuna query, vengono forniti i seguenti elementi:
+                    <ul>
+                        <li>La query vera e propria.</li>
+                        <li>Un'immagine che mostra i risultati dell'interrogazione.</li>
+                        <li>Una breve analisi dei risultati estrapolati, se presente.</li>
+                    </ul>
+                    Questa struttura permette una comprensione chiara e dettagliata delle interrogazioni effettuate e dei dati ottenuti.</p>
+                <h3 class="mb-2" id="query1">1° Question:</h3>
+                <p>
+                    What are the churches with name and description?
+                </p>
+
+                <h3 class="mb-2">Query:</h3>
+                <pre class="mb-4"><code>
+SELECT DISTINCT ?tipo
+WHERE {
+  ?bene a arco:ArchitecturalOrLandscapeHeritage ;
+        dc:type ?tipo .
+}
+                    </code></pre>
+            </section>
+            <section class="mb-5">
+                <h2 class="mb-3">Result</h2>
+                <img src="img_query/query1-1.png" alt="Query 1" class="img-fluid rounded shadow-sm">
+            </section>
+            <section class="mb-5">
+                <h2 class="mb-3">Analysis </h2>
+                <p>
+                    La query cerca tutti i beni architettonici o paesaggistici nel grafo di conoscenza e estrae i tipi unici di questi beni. 
+                </p>
+            </section>
+        </div>
+        <div>
+            <section class="mb-5">
+                <h3 class="mb-2" id="query2">2° Question:</h3>
+                <p>
+                    What are the churches with name and description?
+                </p>
+
+                <h3 class="mb-2">Query:</h3>
+                <pre class="mb-4"><code>SELECT ?sub ?dec
+                    WHERE {
+                      {
+                        ?cp a arco:ArchitecturalOrLandscapeHeritage ;
+                            dc:type ?o ;
+                            dc:subject ?sub ;
+                            dc:description ?dec .
+                        FILTER(str(?o) = 'chiesa')
+                      }
+                      UNION
+                      {
+                        ?cp2 a arco:ArchitecturalOrLandscapeHeritage ;
+                             dc:type ?o2 ;
+                             dc:subject ?sub2 ;
+                             dc:description ?dec2 .
+                        FILTER(str(?o2) = 'cattedrale')
+                      }
+                    }
+                    </code></pre>
+            </section>
+            <section class="mb-5">
+                <h2 class="mb-3">Result</h2>
+                <img src="img_query/query1.png" alt="Query 1" class="img-fluid rounded shadow-sm">
+            </section>
+            <section class="mb-5">
+                <h2 class="mb-3">Analysis </h2>
+                <p>
+                    La query cerca tutti i beni architettonici o paesaggistici (rappresentati da ?cp e ?cp2) che sono di tipo 'chiesa' o cattedrale. Per ogni chiesa o cattedrale trovata, la query restituisce il soggetto (?sub) e la descrizione (?dec) associati.
+                    Osservazione: Le cattedrali presenti nel grafo sono limitate, approssimativamente 7. Pertanto, si è deciso di procedere esclusivamente con l'analisi delle chiese.                </p>
+            </section>
+        </div>
+        <div>
+            <section class="mb-5">
+                <h3 class="mb-2" id="query3">3° Question:</h3>
+                <p>
+                    What are the churches with name and description and if present the author?
+                </p>
+
+                <h3 class="mb-2">Query:</h3>
+                <pre class="mb-4"><code>SELECT ?sub ?dec ?auth
+                    WHERE {
+                      ?cp a arco:ArchitecturalOrLandscapeHeritage ;
+                          dc:type ?o ;
+                          dc:subject ?sub ;
+                          dc:description ?dec .
+                      OPTIONAL { ?cp a-cd:hasAuthor ?auth } .
+                      FILTER(str(?o) = 'chiesa')
+                    }                    
+                    </code></pre>
+            </section>
+            <section class="mb-5">
+                <h2 class="mb-3">Result</h2>
+                <img src="img_query/query2.png" alt="Query 1" class="img-fluid rounded shadow-sm">
+            </section>
+            <section class="mb-5">
+                <h2 class="mb-3">Analysis </h2>
+                <p>
+                    La query cerca tutti i beni architettonici o paesaggistici (rappresentati da ?cp) che sono di tipo 'chiesa'. Per ogni chiesa trovata, la query restituisce il soggetto (?sub), la descrizione (?dec) e, se disponibile, l'autore (?auth).                
+                </p>
+            </section>
+        </div>
+        <div>
+            <section class="mb-5">
+                <h3 class="mb-2" id="query4">4° Question:</h3>
+                <p>
+                    How many churches are there?
+                </p>
+                <h3 class="mb-2">Query:</h3>
+                <pre class="mb-4"><code>SELECT (COUNT(?cp) AS ?numeroChiese)
+                    WHERE {
+                      ?cp a arco:ArchitecturalOrLandscapeHeritage ;
+                          dc:type ?o .
+                      FILTER(str(?o) = 'chiesa')
+                    }                                       
+                    </code></pre>
+            </section>
+            <section class="mb-5">
+                <h2 class="mb-3">Result</h2>
+                <img src="img_query/query3.png" alt="Query 1" class="img-fluid rounded shadow-sm">
+            </section>
+            <section class="mb-5">
+                <h2 class="mb-3">Analysis </h2>
+                <p>
+                    La query cerca tutti i beni architettonici o paesaggistici (rappresentati da ?cp) che sono di tipo 'chiesa' e conta quanti di questi beni esistono. Il risultato è il numero totale di chiese presenti nel grafo di conoscenza.                
+                </p>
+            </section>
+        </div>
+        <div>
+            <section class="mb-5">
+                <h3 class="mb-2" id="query5">5° Question:</h3>
+                <p>
+                    What is the number of churches grouped by region?
+                </p>
+                <h3 class="mb-2">Query:</h3>
+                <pre class="mb-4"><code>SELECT (COUNT(?cp) AS ?numeroChiese)
+                    SELECT ?regionId (COUNT(?regionId) AS ?regionCount)
+                        WHERE {
+                        ?cp a arco:ArchitecturalOrLandscapeHeritage ;
+                            dc:type ?o ;
+                        arco:regionIdentifier ?regionId .
+                        FILTER(str(?o) = 'chiesa')
+                        }
+                        GROUP BY ?regionId
+                        ORDER BY DESC(?regionCount)                 
+                    </code></pre>
+            </section>
+            <section class="mb-5">
+                <h2 class="mb-3">Result</h2>
+                <img src="img_query/query4.png" alt="Query 1" class="img-fluid rounded shadow-sm">
+            </section>
+            <section class="mb-5">
+                <h2 class="mb-3">Analysis </h2>
+                <p>
+                    La query cerca tutti i beni architettonici o paesaggistici (rappresentati da ?cp) che sono di tipo 'chiesa' e sono associati a una regione (?regionId). Poi conta il numero di chiese per ciascuna regione e ordina i risultati in modo decrescente secondo il numero di chiese. 
+                    Da questa query possiamo notare una distribuzione non omogenea del numero di chiese presenti nelle diverse regioni. In particolare, analizzeremo successivamente le chiese e gli stili architettonici presenti in Sicilia, che conta solo 26 chiese identificate dall'ID 19. Questo dato evidenzia alcune lacune da colmare all'interno del Knowledge Graph.             
+                </p>
+            </section>
+        </div>
+
+        <div>
+            <section class="mb-5">
+                <h3 class="mb-2" id="query6" >6° Question:</h3>
+                <p>
+                    What are all the styles concerning barrocco in italy?
+                </p>
+                <h3 class="mb-2">Query:</h3>
+                <pre class="mb-4"><code>
+                    PREFIX dcterms: <http://purl.org/dc/terms/>
+
+                    SELECT ?lStile (COUNT(?stile) AS ?stileCount)
+                    WHERE {
+                    ?cp a arco:ArchitecturalOrLandscapeHeritage ;
+                        dc:type ?o ;
+                        a-cd:hasAuthorshipAttribution ?Auth ;
+                        dcterms:spatial ?loc .
+                    ?loc rdfs:label ?l .
+                    ?Auth a-cd:hasCulturalScope ?stile .
+                    ?stile rdfs:label ?lStile .
+                    FILTER(str(?o) = "chiesa") 
+                    FILTER(REGEX(?lStile, "barocco", "i"))
+                    }
+                    GROUP BY ?lStile
+                    ORDER BY DESC(?stileCount)
+                    </code></pre>
+            </section>
+            <section class="mb-5">
+                <h2 class="mb-3">Result</h2>
+                <img src="img_query/query-5.png" alt="Query 1" class="img-fluid rounded shadow-sm">
+            </section>
+            <section class="mb-5">
+                <h2 class="mb-3">Analysis </h2>
+                <p>
+                    La query cerca tutti i beni architettonici o paesaggistici di tipo "chiesa" e con stile culturale contenente la parola "barocco". Conta il numero di occorrenze di ciascuno stile barocco e ordina i risultati in ordine decrescente secondo il numero di occorrenze.
+                    Ora concentriamo la nostra attenzione sugli stili architettonici presenti in Italia, in particolare sullo stile barocco. Dalle fonti disponibili online, emerge che lo stile barocco è prevalentemente presente nelle regioni Sicilia, Lazio (con Roma) e Puglia. Vogliamo verificare questa informazione interrogando il Knowledge Graph (KG) per confermarla.
+                </p>
+            </section>
+        </div>
+
+
+        <div>
+            <section class="mb-5">
+                <h3 class="mb-2" id="query7" >7° Question:</h3>
+                <p>
+                    Qualsi sono le chiese siciliane?
+                </p>
+                <h3 class="mb-2">Query:</h3>
+                <pre class="mb-4"><code>
+                    PREFIX dcterms: <http://purl.org/dc/terms/>
+
+                    SELECT ?cp ?loc ?l ?lStile
+                    WHERE {
+                      ?cp a arco:ArchitecturalOrLandscapeHeritage ;
+                          dc:type ?o ;
+                          a-cd:hasAuthorshipAttribution ?Auth ;
+                          dcterms:spatial ?loc .
+                      ?loc rdfs:label ?l .
+                      ?Auth a-cd:hasCulturalScope ?stile .
+                    ?stile rdfs:label ?lStile .
+                      FILTER(str(?o) = "chiesa") 
+                      FILTER(REGEX(?l, "Sicilia", "i"))
+                    } 
+                    </code></pre>
+            </section>
+            <section class="mb-5">
+                <h2 class="mb-3">Result</h2>
+                <img src="img_query/query-6-1-.png" alt="Query 1" class="img-fluid rounded shadow-sm">
+                <img src="img_query/query5.png" alt="Query 1" class="img-fluid rounded shadow-sm">
+            </section>
+            <section class="mb-5">
+                <h2 class="mb-3">Analysis </h2>
+                <p>
+                    La query cerca tutti i beni architettonici o paesaggistici di tipo "chiesa" che si trovano in Sicilia. Per ogni chiesa trovata, la query restituisce l'identificativo del bene (?cp), la sua localizzazione (?l), e l'etichetta dello stile architettonico (?lStile).                
+                </p>
+            </section>
+        </div>
+        <div>
+            <section class="mb-5">
+                <h3 class="mb-2" id="query8">8° Question:</h3>
+                <p>
+                    What styles are most common in Sicilian churches?
+                </p>
+                <h3 class="mb-2">Query:</h3>
+                <pre class="mb-4"><code>
+                    PREFIX dcterms: <http://purl.org/dc/terms/>
+
+                    SELECT ?nomeStile (COUNT(?stile) AS ?stileCount)
+                    WHERE {
+                      ?cp a arco:ArchitecturalOrLandscapeHeritage ;
+                          dc:type ?o ;
+                          a-cd:hasAuthorshipAttribution ?Auth ;
+                          dcterms:spatial ?loc .
+                      ?loc rdfs:label ?l .
+                      ?Auth a-cd:hasCulturalScope ?stile .
+                    ?stile rdfs:label ?nomeStile .
+                      FILTER(str(?o) = "chiesa") 
+                      FILTER(REGEX(?l, "Sicilia", "i"))
+                    }
+                    GROUP BY ?nomeStile
+                    ORDER BY DESC(?stileCount)
+                    LIMIT 4
+                    
+                    
+                    </code></pre>
+            </section>
+            <section class="mb-5">
+                <h2 class="mb-3">Result</h2>
+                <img src="img_query/query6.png" alt="Query 1" class="img-fluid rounded shadow-sm">
+            </section>
+            <section class="mb-5">
+                <h2 class="mb-3">Analysis </h2>
+                <p>
+                    La query cerca tutte le chiese in Sicilia e conta il numero di occorrenze di ciascuno stile architettonico tra queste chiese. I risultati sono ordinati in base alla frequenza degli stili, e vengono restituiti solo i primi 4 stili più comuni.                </p>
+            </section>
+        </div>
+        <div>
+            <section class="mb-5">
+                <h2 class="mb-5">Conclusioni finale - fase SPARQ</h2>
+                <p>
+                    Dopo una dettagliata fase di interrogazione dell'ontologia Arco, è emerso un dato sorprendente sulla distribuzione delle chiese nel territorio siciliano rispetto alle altre regioni. Il numero di chiese in Sicilia è significativamente inferiore, suggerendo una potenziale sottorappresentazione nel database.
+
+                    Dal punto di vista architettonico, un'analisi approfondita ha rivelato che oltre 80 chiese siciliane sono classificate come barocche, secondo Wikipedia. Tuttavia, solo 8 di queste chiese barocche sono effettivamente presenti nel database dell'ontologia Arco. Ciò è particolarmente significativo se si considera che l'ontologia comprende più di 350 chiese barocche in totale.
+                    
+                    Questa discrepanza indica chiaramente una notevole mancanza di dati relativi alle chiese siciliane, in particolare quelle di stile barocco, nel database di Arco. Tale lacuna costituisce un ostacolo alla comprensione completa e accurata del patrimonio architettonico siciliano, evidenziando l'importanza di un'attività di raccolta e inserimento dei dati più approfondita ed estesa.
+                    
+                    La sezione seguente esplorerà come l'uso dei Large Language Models (LLM) possa essere uno strumento efficace per migliorare il popolamento dell'ontologia, contribuendo così a una rappresentazione più accurata e completa delle chiese siciliane e del loro valore storico e artistico.
+
+                </p>
+            
+                    <img src="img_query/wiki.png" alt="WIKI" class="img-fluid rounded shadow-sm">
+
+                </section>
+        </div>
+        <div>
+            <section class="mb-5">
+                <h1 class="mb-5">Arricchimento tramite LLMs</h1>
+                <p>In questa sezione vengono analizzate le query SPARQL utilizzate per interrogare il grafo di conoscenza. Per ciascuna query, vengono forniti i seguenti elementi:
+                    <ul>
+                        <li>La query vera e propria.</li>
+                        <li>Un'immagine che mostra i risultati dell'interrogazione.</li>
+                        <li>Una breve analisi dei risultati estrapolati, se presente.</li>
+                    </ul>
+                    Questa struttura permette una comprensione chiara e dettagliata delle interrogazioni effettuate e dei dati ottenuti.</p>
+            </section>
+        </div>
+        <h2 class="mb-5" id="chat">1° Metodologia - ChatGPT</h2>
+        <div>
+            <section class="mb-5">
+                <h3 class="mb-3">1° Question </h3>
+                <p>
+                    Can you extrapolate the churches present in the city "Acireale"?
+                </p>
+            </section>
+            <section class="mb-5">
+                <h3 class="mb-3">Result</h3>
+                <img src="chatgpt/chat1.png" alt="Query 1" class="img-fluid rounded shadow-sm">
+            </section>
+            <section class="mb-5">
+                <h3 class="mb-3">Analysis </h3>
+                <p>
+                    La query si focalizza sulle chiese situate ad Acireale, garantendo precisione e brevi descrizioni. Inizialmente, vengono forniti solo alcuni risultati, ma interrogando ulteriormente è possibile ottenere un elenco più ampio, arrivando fino a 20 o 30 chiese. A titolo illustrativo, vengono riportati gli esempi delle chiese più rilevanti per semplificare la visualizzazione.                </p>
+            </section>
+        </div>
+        <div>
+            <section class="mb-5">
+                <h3 class="mb-3">2° Question </h3>
+                <p>
+                    For every church can you extract exactly what the main topics are based on this description?
+                </p>
+            </section>
+            <section class="mb-5">
+                <h3 class="mb-3">Result</h3>
+                <img src="chatgpt/chat2.png" alt="Query 1" class="img-fluid rounded shadow-sm">
+            </section>
+            <section class="mb-5">
+                <h3 class="mb-3">Analysis </h3>
+                <p>
+                    La query mira a estrarre i principali argomenti, permettendo di valutare se corrispondono ai campi presenti nel Knowledge Graph (KG). Questo primo passo consente di individuare la congruenza tra i dati estratti e quelli presenti nel KG.       
+                </p>    
+            </section>
+        </div>
+        <div>
+            <section class="mb-5">
+                <h3 class="mb-3">3° Question </h3>
+                <p>
+                    For every church could you transform this entity/resource into RDF format?
+                </p>
+            </section>
+            <section class="mb-5">
+                <h3 class="mb-3">Result</h3>
+                <img src="chatgpt/chat3.png" alt="Query 1" class="img-fluid rounded shadow-sm">
+            </section>
+            <section class="mb-5">
+                <h3 class="mb-3">Analysis </h3>
+                <p>
+                    Con questa query, possiamo testare la capacità di ottenere un formato RDF a partire dalla descrizione. Tuttavia, vogliamo ora confermare che i risultati siano conformi all'ontologia Arco.                
+                </p>
+                </section>
+        </div>
+        <div>
+            <section class="mb-5">
+                <h3 class="mb-3">4° Question </h3>
+                <p>
+                    For every church could you transform this entity/resource into RDF format?
+                </p>
+            </section>
+            <section class="mb-5">
+                <h3 class="mb-3">Result</h3>
+                <img src="chatgpt/chat4.png" alt="Query 1" class="img-fluid rounded shadow-sm">
+            </section>
+            <section class="mb-5">
+                <h2 class="mb-3">Osservazione finale: </h2>
+                <p>
+                    Il campo rdfs:label è è corretto, ma dovremmo anche considerare di aggiungere dc:title
+                    Conosciamo l'ID della regione, quindi possiamo utilizzare arco che è uguale a 19. 
+                    Non esiste la proprietà arco:ReligousBuilding inevece dobbiamo usare arco:ArchitecturalOrLandscapeHeritage
+                    Lo stile arichettonico "barrocco" va sotto le proprietà a-cd:hasAuthorshipAttribution a-cd:hasCulturalScope rdfs:label  Barrocco
+                    Le proprietà hasFeatures possono riguardare decorazioni interne, dipinti, opere d'arte. Tuttavia tale proprietà non esiste ma può essere inserita sotto l'entità core:hasPart
+                    Chatgpt non è riuscito a fornirci l'autore per tale motivo possiamo interrogarlo nuovamente specificando la domanda in questione e ottenre la nostra proprietà.
+                    Nello KG non è presente l'arco isDedicatedTo, ma potrebbe essere aggiunto.
+                </p>
+            </section>
+            <section class="mb-5">
+                <h3 class="mb-3">Additional information</h3>
+                <img src="chatgpt/chat5.png" alt="Query 1" class="img-fluid rounded shadow-sm">
+            </section>
+            <p> Author could be OPTIONAL</p>
+            <h3 class="mb-2">Final Ontology:</h3>
+            <pre class="mb-4">
+            <code>
+                <https://w3id.org/arco/ontology/core/hasPart> 
+                <https://w3id.org/arco/ontology/context-description/hasAuthorshipAttribution> 
+                <https://w3id.org/arco/resource/ArchitecturalOrLandscapeHeritage/1000000001> 
+                
+                
+                  rdf:type arco:ArchitecturalOrLandscapeHeritage;
+                  rdfs:label "Duomo di Acireale" ;
+                  dc:description “The Duomo di Acireale, also known as the Cathedral of Acireale, is a significant religious landmark located in the city of Acireale, Sicily, Italy. The cathedral is dedicated to the Annunciation of the Blessed Virgin Mary. It is renowned for its impressive architectural style, which is a fusion of Baroque and Norman influences. The facade features intricate decorations and sculptures, while the interior boasts stunning frescoes, ornate altars, and beautiful stained glass windows.”;
+                core:hasPart  <https://w3id.org/arco/resource/CulturalPropertyPart/0100002407-Interior-decoration> .
+                a-cd:hasAuthorshipAttribution <https://w3id.org/arco/resource/CulturalScopeAttribution/1900115094-cultural-scope-attribution-1>
+                arco:isDedicatedTo "Annunciation of the Blessed Virgin Mary" .
+                
+            </code>
+            </pre>
+        </div>
+
+        <!-- LAMA -->
+        <h2 class="mb-5" id="lama">2° Metodologia -  LLaMa 2</h2>
+        <div>
+            <section class="mb-5">
+                <h3 class="mb-3">1° Question </h3>
+                <p>
+                    Can you extrapolate the churches present in the city "Acireale"?
+                </p>
+            </section>
+            <section class="mb-5">
+                <h3 class="mb-3">Result</h3>
+                <img src="lama/lama1.png" alt="Query 1" class="img-fluid rounded shadow-sm">
+            </section>
+            <section class="mb-5">
+                <h3 class="mb-3">Analysis </h3>
+                <p>
+                    La query si focalizza sulle chiese situate ad Acireale, garantendo precisione e brevi descrizioni. Inizialmente, vengono forniti solo alcuni risultati, ma interrogando ulteriormente è possibile ottenere un elenco più ampio, arrivando fino a 20 o 30 chiese. A titolo illustrativo, vengono riportati gli esempi delle chiese più rilevanti per semplificare la visualizzazione.                </p>
+            </section>
+        </div>
+        <div>
+            <section class="mb-5">
+                <h3 class="mb-3">2° Question </h3>
+                <p>
+                    For every church can you extract exactly what the main topics are based on this description?
+                </p>
+            </section>
+            <section class="mb-5">
+                <h3 class="mb-3">Result</h3>
+                <img src="lama/lama2.png" alt="Query 1" class="img-fluid rounded shadow-sm">
+            </section>
+            <section class="mb-5">
+                <h3 class="mb-3">Analysis </h3>
+                <p>
+                    La query mira a estrarre i principali argomenti, permettendo di valutare se corrispondono ai campi presenti nel Knowledge Graph (KG). Questo primo passo consente di individuare la congruenza tra i dati estratti e quelli presenti nel KG.       
+                </p>    
+            </section>
+        </div>
+        <div>
+            <section class="mb-5">
+                <h3 class="mb-3">3° Question </h3>
+                <p>
+                    For every church could you transform this entity/resource into RDF format?
+                </p>
+            </section>
+            <section class="mb-5">
+                <h3 class="mb-3">Result</h3>
+                <img src="lama/lama3.png" alt="Query 1" class="img-fluid rounded shadow-sm">
+            </section>
+            <section class="mb-5">
+                <h3 class="mb-3">Analysis </h3>
+                <p>
+                    Con questa query, possiamo testare la capacità di ottenere un formato RDF a partire dalla descrizione. Tuttavia, vogliamo ora confermare che i risultati siano conformi all'ontologia Arco.                
+                </p>
+                </section>
+        </div>
+        <div>
+            <section class="mb-5">
+                <h3 class="mb-3">4° Question </h3>
+                <p>
+                    For every RDF could you transform this using ArCo ontology?
+                </p>
+            </section>
+            <section class="mb-5">
+                <h3 class="mb-3">Result</h3>
+                <img src="lama/lama4.png" alt="Query 1" class="img-fluid rounded shadow-sm">
+            </section>
+            <section class="mb-5">
+                <h2 class="mb-3">Osservazione finale: </h2>
+                <p>
+                    Dalle prime osservazioni, è evidente che LLaMa 2 riesce a estrarre più informazioni efficacemente durante la fase iniziale, senza richiedere ulteriori interrogazioni al motore LLM. Tuttavia, mostra carenze significative nella traduzione dal formato RDF all'ontologia Arco. Per esempio, le informazioni riguardanti lo stile architettonico e le date di costruzione sono assenti o presenti solo in modo parziale nella descrizione stessa, senza essere estratte come nuove entità o relazioni. Al contrario, l'estrapolazione delle informazioni sulla localizzazione risulta particolarmente interessante.
+                    Il campo dc:title è corretto, ma dovremmo anche considerare di aggiungere rdfs:label.
+                    Invece di utilizzare arco:Church bisogna inserire dc:type chiesa 
+                    Lo stile arichettonico "barrocco" va sotto le proprietà a-cd:hasAuthorshipAttribution a-cd:hasCulturalScope rdfs:label  Barrocco
+                    Per quanto riguarda la location possiamo invece collegaro a dcterms:spatial e creare l'entity per la città Acireale ad esempio: 
+                    https://w3id.org/arco/resource/Address/bd72c50c385b1ad5aecb76b354427e6d
+                </p>
+            </section>
+            <h3 class="mb-2">Final Ontology:</h3>
+            <pre class="mb-4">
+            <code>                
+                  dc:type chiesa 
+                  dc:tile " Cathedral of Acireale" ;
+                  dc:description “Stunning Facade and impressive interior”;
+                  a-cd:hasAuthorshipAttribution <https://w3id.org/arco/resource/CulturalScopeAttribution/1900115094-cultural-scope-attribution-1> .
+                  dcterms:spatial https://w3id.org/arco/resource/Address/bd72c50c385b1ad5aecb76b354427e6d .
+            </code>
+            </pre>
+        </div>
+
+
+        <!-- GEMINI -->
+        <h2 class="mb-5" id="gemini">3° Metodologia -  GEMINI</h2>
+        <div>
+            <section class="mb-5">
+                <h3 class="mb-3">1° Question </h3>
+                <p>
+                    Can you extrapolate the churches present in the city "Acireale"?
+                </p>
+            </section>
+            <section class="mb-5">
+                <h3 class="mb-3">Result</h3>
+                <img src="gemini/gemini1.png" alt="Query 1" class="img-fluid rounded shadow-sm">
+            </section>
+            <section class="mb-5">
+                <h3 class="mb-3">Analysis </h3>
+                <p>
+                    La query si focalizza sulle chiese situate ad Acireale, garantendo precisione e brevi descrizioni. Inizialmente, vengono forniti solo alcuni risultati, ma interrogando ulteriormente è possibile ottenere un elenco più ampio, arrivando fino a 20 o 30 chiese. A titolo illustrativo, vengono riportati gli esempi delle chiese più rilevanti per semplificare la visualizzazione.                </p>
+            </section>
+        </div>
+        <div>
+            <section class="mb-5">
+                <h3 class="mb-3">2° Question </h3>
+                <p>
+                    Could you give me more information about Acireale Cathedral?
+                </p>
+            </section>
+            <section class="mb-5">
+                <h3 class="mb-3">Result</h3>
+                <img src="gemini/gemini2.png" alt="Query 1" class="img-fluid rounded shadow-sm">
+            </section>
+            <section class="mb-5">
+                <h3 class="mb-3">Analysis </h3>
+                <p>
+                    La query mira a estrarre i principali argomenti, permettendo di valutare se corrispondono ai campi presenti nel Knowledge Graph (KG). Questo primo passo consente di individuare la congruenza tra i dati estratti e quelli presenti nel KG.       
+                </p>    
+            </section>
+        </div>
+        <div>
+            <section class="mb-5">
+                <h3 class="mb-3">3° Question </h3>
+                <p>
+                    Can you extract exactly what the main topics are based on this description?
+                </p>
+            </section>
+            <section class="mb-5">
+                <h3 class="mb-3">Result</h3>
+                <img src="gemini/gemini3.png" alt="Query 1" class="img-fluid rounded shadow-sm">
+            </section>
+            <section class="mb-5">
+                <h3 class="mb-3">Analysis </h3>
+                <p>
+                    La query mira a estrarre i principali argomenti, permettendo di valutare se corrispondono ai campi presenti nel Knowledge Graph (KG). Questo primo passo consente di individuare la congruenza tra i dati estratti e quelli presenti nel KG.       
+                </p>    
+            </section>
+        </div>
+        <div>
+            <section class="mb-5">
+                <h3 class="mb-3">4° Question </h3>
+                <p>
+                    could you transform this entity/resource into RDF format?
+                </p>
+            </section>
+            <section class="mb-5">
+                <h3 class="mb-3">Result</h3>
+                <img src="gemini/gemini4.png" alt="Query 1" class="img-fluid rounded shadow-sm">
+            </section>
+            <section class="mb-5">
+                <h3 class="mb-3">Analysis </h3>
+                <p>
+                    Con questa query, possiamo testare la capacità di ottenere un formato RDF a partire dalla descrizione. Tuttavia, vogliamo ora confermare che i risultati siano conformi all'ontologia Arco.                
+                </p>
+                </section>
+        </div>
+        <div>
+            <section class="mb-5">
+                <h3 class="mb-3">5° Question </h3>
+                <p>
+                    For every RDF could you transform this using ArCo ontology?
+                </p>
+            </section>
+            <section class="mb-5">
+                <h3 class="mb-3">Result</h3>
+                <img src="gemini/gemini5.png" alt="Query 1" class="img-fluid rounded shadow-sm">
+                <img src="gemini/gemini6.png" alt="Query 1" class="img-fluid rounded shadow-sm">
+            </section>
+            <section class="mb-5">
+                <h2 class="mb-3">Osservazione finale: </h2>
+                <p>
+                    Dalle prime osservazioni, è evidente che Gemini riesce a estrarre più informazioni efficacemente ma soltanto chiedendo una query più dettagliata sulla chiesa in questione.
+                    Gemini nella fase finale ci allerta della difficoltà di tradurre utilizzando l'ontologia Arco difatti ci fornisce solo le proprietà di cui riesce a fare la traduzione andando ad esludere tutte le informazioni rigurardo algi eventi speciali che riguardano la chiesta, le date di costruzioni e lo stile architettonico 
+                    più nel dettaglio:
+                    Il campo skos:prefLabel viene sostituito da rdfs:label.
+                    Il campo arco:hasDescription viene sostituito da dc:description.
+                    Per quanto riguarda la location possiamo invece collegaro a dcterms:spatial e creare l'entity per la città Acireale ad esempio: 
+                    https://w3id.org/arco/resource/Address/bd72c50c385b1ad5aecb76b354427e6d
+                </p>
+            </section>
+            <h3 class="mb-2">Final Ontology:</h3>
+            <pre class="mb-4">
+            <code>                
+                  dc:tile "Cathedral of Maria Santissima Annunziata" ;
+                  dc:description “Dedicated to the Annunciation of the Blessed Virgin Mary.”;
+                  dcterms:spatial https://w3id.org/arco/resource/Address/bd72c50c385b1ad5aecb76b354427e6d .
+            </code>
+            </pre>
+        </div>
+
+
+        <!-- MISTRAL -->
+        <!-- <h2 class="mb-5">3° Metodologia -  MISTRAL</h2>
+        <div>
+            <section class="mb-5">
+                <h3 class="mb-3">1° Question </h3>
+                <p>
+                    Can you extrapolate the churches present in the city "Acireale"?
+                </p>
+            </section>
+            <section class="mb-5">
+                <h3 class="mb-3">Result</h3>
+                <img src="gemini/gemini1.png" alt="Query 1" class="img-fluid rounded shadow-sm">
+            </section>
+            <section class="mb-5">
+                <h3 class="mb-3">Analysis </h3>
+                <p>
+                    La query si focalizza sulle chiese situate ad Acireale, garantendo precisione e brevi descrizioni. Inizialmente, vengono forniti solo alcuni risultati, ma interrogando ulteriormente è possibile ottenere un elenco più ampio, arrivando fino a 20 o 30 chiese. A titolo illustrativo, vengono riportati gli esempi delle chiese più rilevanti per semplificare la visualizzazione.                </p>
+            </section>
+        </div>
+        <div>
+            <section class="mb-5">
+                <h3 class="mb-3">2° Question </h3>
+                <p>
+                    Could you give me more information about Acireale Cathedral?
+                </p>
+            </section>
+            <section class="mb-5">
+                <h3 class="mb-3">Result</h3>
+                <img src="gemini/gemini2.png" alt="Query 1" class="img-fluid rounded shadow-sm">
+            </section>
+            <section class="mb-5">
+                <h3 class="mb-3">Analysis </h3>
+                <p>
+                    La query mira a estrarre i principali argomenti, permettendo di valutare se corrispondono ai campi presenti nel Knowledge Graph (KG). Questo primo passo consente di individuare la congruenza tra i dati estratti e quelli presenti nel KG.       
+                </p>    
+            </section>
+        </div>
+        <div>
+            <section class="mb-5">
+                <h3 class="mb-3">3° Question </h3>
+                <p>
+                    Can you extract exactly what the main topics are based on this description?
+                </p>
+            </section>
+            <section class="mb-5">
+                <h3 class="mb-3">Result</h3>
+                <img src="gemini/gemini3.png" alt="Query 1" class="img-fluid rounded shadow-sm">
+            </section>
+            <section class="mb-5">
+                <h3 class="mb-3">Analysis </h3>
+                <p>
+                    La query mira a estrarre i principali argomenti, permettendo di valutare se corrispondono ai campi presenti nel Knowledge Graph (KG). Questo primo passo consente di individuare la congruenza tra i dati estratti e quelli presenti nel KG.       
+                </p>    
+            </section>
+        </div>
+        <div>
+            <section class="mb-5">
+                <h3 class="mb-3">4° Question </h3>
+                <p>
+                    could you transform this entity/resource into RDF format?
+                </p>
+            </section>
+            <section class="mb-5">
+                <h3 class="mb-3">Result</h3>
+                <img src="gemini/gemini4.png" alt="Query 1" class="img-fluid rounded shadow-sm">
+            </section>
+            <section class="mb-5">
+                <h3 class="mb-3">Analysis </h3>
+                <p>
+                    Con questa query, possiamo testare la capacità di ottenere un formato RDF a partire dalla descrizione. Tuttavia, vogliamo ora confermare che i risultati siano conformi all'ontologia Arco.                
+                </p>
+                </section>
+        </div>
+        <div>
+            <section class="mb-5">
+                <h3 class="mb-3">5° Question </h3>
+                <p>
+                    For every RDF could you transform this using ArCo ontology?
+                </p>
+            </section>
+            <section class="mb-5">
+                <h3 class="mb-3">Result</h3>
+                <img src="gemini/gemini5.png" alt="Query 1" class="img-fluid rounded shadow-sm">
+                <img src="gemini/gemini6.png" alt="Query 1" class="img-fluid rounded shadow-sm">
+            </section>
+            <section class="mb-5">
+                <h2 class="mb-3">Osservazione finale: </h2>
+                <p>
+                    Dalle prime osservazioni, è evidente che Gemini riesce a estrarre più informazioni efficacemente ma soltanto chiedendo una query più dettagliata sulla chiesa in questione.
+                    Gemini nella fase finale ci allerta della difficoltà di tradurre utilizzando l'ontologia Arco difatti ci fornisce solo le proprietà di cui riesce a fare la traduzione andando ad esludere tutte le informazioni rigurardo algi eventi speciali che riguardano la chiesta, le date di costruzioni e lo stile architettonico 
+                    più nel dettaglio:
+                    Il campo skos:prefLabel viene sostituito da rdfs:label.
+                    Il campo arco:hasDescription viene sostituito da dc:description.
+                    Per quanto riguarda la location possiamo invece collegaro a dcterms:spatial e creare l'entity per la città Acireale ad esempio: 
+                    https://w3id.org/arco/resource/Address/bd72c50c385b1ad5aecb76b354427e6d
+                </p>
+            </section>
+            <h3 class="mb-2">Final Ontology:</h3>
+            <pre class="mb-4">
+            <code>                
+                  dc:tile "Cathedral of Maria Santissima Annunziata" ;
+                  dc:description “Dedicated to the Annunciation of the Blessed Virgin Mary.”;
+                  dcterms:spatial https://w3id.org/arco/resource/Address/bd72c50c385b1ad5aecb76b354427e6d .
+            </code>
+            </pre>
+        </div> -->
+    </main>
+    <footer class="bg-dark text-white text-center py-4 fixed-bottom">
+        <div class="container"> 
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Il Mio Progetto</h5>
+                    <p>&copy; 2024 Il Mio Progetto. Tutti i diritti riservati.</p>
+                </div>
+                <div class="col-md-6">
+                    <h5>Seguici</h5>
+                    <a href="#" class="text-white mx-2"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="text-white mx-2"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="text-white mx-2"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="text-white mx-2"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</body>
+</html>
